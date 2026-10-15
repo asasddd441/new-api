@@ -21,6 +21,12 @@ For commercial licensing, please contact support@quantumnous.com
 export const CHANNEL_TEST_ENDPOINTS = [
   { value: '', label: '', stream: true },
   {
+    value: 'vertex-native',
+    label: 'Vertex Native (/v1/models/{model}:{action})',
+    stream: false,
+    channels: [41],
+  },
+  {
     value: 'typesafe-systemone',
     label: 'TypeSafe (/v1/systemone)',
     stream: false,
@@ -98,12 +104,52 @@ export function getChannelTestEndpoints(channelType, t) {
   const type = Number(channelType);
   return CHANNEL_TEST_ENDPOINTS.filter((endpoint) => {
     if (endpoint.channels && !endpoint.channels.includes(type)) return false;
+    if (type === 41)
+      return [
+        '',
+        'openai',
+        'anthropic',
+        'openai-response',
+        'gemini',
+        'vertex-native',
+        'embeddings',
+        'image-generation',
+        'audio-speech',
+        'audio-transcription',
+        'openai-video',
+      ].includes(endpoint.value);
+    if (type === 20)
+      return [
+        '',
+        'openai',
+        'anthropic',
+        'openai-response',
+        'embeddings',
+        'jina-rerank',
+        'image-generation',
+        'audio-speech',
+        'audio-transcription',
+      ].includes(endpoint.value);
     if (type === 71) return ['', 'typesafe-systemone'].includes(endpoint.value);
     if (type === 72)
       return ['', 'openai', 'anthropic'].includes(endpoint.value);
+    if (type === 77)
+      return [
+        '',
+        'openai',
+        'anthropic',
+        'openai-response',
+        'image-generation',
+        'openai-video',
+        'audio-speech',
+        'embeddings',
+        'jina-rerank',
+      ].includes(endpoint.value);
     return true;
   }).map((endpoint) => ({
     ...endpoint,
+    stream:
+      type === 77 && endpoint.value === 'audio-speech' ? true : endpoint.stream,
     label:
       endpoint.value === ''
         ? t('自动检测')

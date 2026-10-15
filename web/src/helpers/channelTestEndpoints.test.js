@@ -49,6 +49,37 @@ describe('channel test endpoints', () => {
     expect(options(71)).toEqual(['', 'typesafe-systemone']);
     expect(channelTestSupportsStream(71, '')).toBe(false);
     expect(options(72)).toEqual(['', 'openai', 'anthropic']);
+    expect(options(77)).toEqual([
+      '',
+      'openai',
+      'openai-response',
+      'anthropic',
+      'jina-rerank',
+      'image-generation',
+      'openai-video',
+      'embeddings',
+      'audio-speech',
+    ]);
+    for (const endpoint of [
+      '',
+      'openai',
+      'openai-response',
+      'anthropic',
+      'audio-speech',
+    ]) {
+      expect(channelTestSupportsStream(77, endpoint)).toBe(true);
+    }
+    for (const endpoint of [
+      'jina-rerank',
+      'image-generation',
+      'openai-video',
+      'embeddings',
+    ]) {
+      expect(channelTestSupportsStream(77, endpoint)).toBe(false);
+    }
+    expect(channelTestSupportsStream(77, 'openai-response-compact')).toBe(
+      false,
+    );
     expect(options('34')).toContain('cohere-chat');
     expect(options(1)).not.toContain('cohere-chat');
     expect(options(67)).toContain('batch-generation');
@@ -71,5 +102,47 @@ describe('channel test endpoints', () => {
         .filter(Boolean)
         .sort(),
     ).toEqual(backend.sort());
+  });
+});
+
+describe('OpenRouter channel test endpoints', () => {
+  test('exposes supported inference endpoints and stream choices', () => {
+    expect(options(20)).toEqual([
+      '',
+      'openai',
+      'openai-response',
+      'anthropic',
+      'jina-rerank',
+      'image-generation',
+      'embeddings',
+      'audio-speech',
+      'audio-transcription',
+    ]);
+    expect(channelTestSupportsStream(20, 'openai')).toBe(true);
+    expect(channelTestSupportsStream(20, 'anthropic')).toBe(true);
+    expect(channelTestSupportsStream(20, 'openai-response')).toBe(true);
+    for (const endpoint of [
+      'audio-speech',
+      'audio-transcription',
+      'embeddings',
+      'jina-rerank',
+      'openai-response-compact',
+      'openai-video',
+    ]) {
+      expect(channelTestSupportsStream(20, endpoint)).toBe(false);
+    }
+  });
+});
+
+describe('Vertex inference endpoints', () => {
+  test('offers native inference and only supported compatibility protocols', () => {
+    expect(options(41)[0]).toBe('');
+    expect(options(41)).toContain('vertex-native');
+    expect(options(41)).toContain('embeddings');
+    expect(options(41)).toContain('audio-speech');
+    expect(options(41)).not.toContain('openai-response-compact');
+    expect(options(41)).not.toContain('jina-rerank');
+    expect(options(1)).not.toContain('vertex-native');
+    expect(channelTestSupportsStream(41, 'vertex-native')).toBe(false);
   });
 });
