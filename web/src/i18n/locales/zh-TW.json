@@ -1,5 +1,6 @@
 {
   "translation": {
+    "决策模型 decision-model-preview 使用 System One（/v1/systemone），请求需包含 state 和 questions，不支持流式。渠道测试可选择自动检测或 System One。": "決策模型 decision-model-preview 使用 System One（/v1/systemone），請求需包含 state 和 questions，不支援串流。渠道測試可選擇自動偵測或 System One。",
     "意图理解模型 tongyi-intent-detect-v3 使用 Chat Completions，通过 system 消息选择意图分类或工具调用模式。": "意圖理解模型 tongyi-intent-detect-v3 使用 Chat Completions，透過 system 訊息選擇意圖分類或工具呼叫模式。",
     "千问AI平台": "千問AI平台",
     "千问AI平台支持对话、图片、音频、视频、向量和重排序，以及已存储 Responses 的查询和删除；暂不支持 compact。填写按量付费 API Key，模型可获取或手动配置。非 Token 模型需配置单位价格：图片按张、视频及音频生成按秒、字符计费 TTS 按字符。": "千問AI平台支援對話、圖片、音訊、影片、向量和重排序，以及已儲存 Responses 的查詢和刪除；暫不支援 compact。填寫隨用隨付 API Key，模型可取得或手動設定。非 Token 模型需設定單位價格：圖片按張、影片及音訊生成按秒、字元計費 TTS 按字元。",
@@ -41,7 +42,7 @@
     "默认关闭，开启后定时增删 OpenCode Zen 的免费对话模型，保留其他模型和手动映射；不自动加入 JEV 等非对话模型，站内计费使用现有定价。": "預設關閉。開啟後定期增刪 OpenCode Zen 的免費對話模型，保留其他模型和手動映射；不自動加入 JEV 等非對話模型，站內計費使用現有定價。",
     "OpenCode 免费模型同步已开启，全部模型巡检设置暂时停用": "OpenCode 免費模型同步已開啟，全部模型巡檢設定暫時停用",
     "统一使用 OpenCode 客户端标识": "統一使用 OpenCode 用戶端識別資訊",
-    "默认开启，在请求头覆盖处理完成后统一使用 OpenCode 客户端身份，并生成会话、请求标识。关闭后可自定义身份；鉴权和其他自定义头保持生效。": "預設開啟，在請求標頭覆蓋處理完成後統一使用 OpenCode 用戶端身分，並產生工作階段、請求識別碼。關閉後可自訂身分；驗證和其他自訂標頭仍然生效。",
+    "默认开启，在请求头覆盖处理完成后统一使用 OpenCode 客户端身份，并生成会话标识。关闭后可自定义身份；鉴权和其他自定义头保持生效。": "預設開啟，在請求標頭覆蓋處理完成後統一使用 OpenCode 用戶端身分，並產生工作階段識別碼。關閉後可自訂身分；驗證和其他自訂標頭仍然生效。",
     "Zen 免费对话模型始终使用上游流式请求并补充必要的工具声明，保留调用方原有工具；全局或渠道请求体透传不会关闭此兼容处理。": "Zen 免費對話模型一律使用上游串流請求並補充必要的工具宣告，保留呼叫端原有工具；全域或渠道請求本文透傳不會關閉此相容處理。",
     "MiMo 支持 OpenAI 和 Anthropic 对话接口。模型列表会补充 mimo-v2.6-pro-ultraspeed；该模型暂按 v2.5-pro 的站内价格计费，可在模型定价中调整。": "MiMo 支援 OpenAI 和 Anthropic 對話介面。模型清單會補充 mimo-v2.6-pro-ultraspeed；該模型暫按 v2.5-pro 的站內價格計費，可在模型定價中調整。",
     "NodeLoc Client ID": "NodeLoc Client ID",

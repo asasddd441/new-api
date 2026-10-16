@@ -30,6 +30,9 @@ func openRouterInvalid(message string) *types.NewAPIError {
 
 func openRouterRequestURL(info *relaycommon.RelayInfo) (string, error) {
 	base := openrouter.NormalizeBaseURL(info.ChannelBaseUrl)
+	if info.RelayMode == relayconstant.RelayModeDecisions && info.ChannelOtherSettings.IsOpenRouterEnterprise() {
+		return "", openRouterInvalid("native Decisions requires a standard channel")
+	}
 	if !isOpenRouterNative(info) {
 		if info.RelayFormat == types.RelayFormatClaude || info.RelayFormat == types.RelayFormatGemini {
 			if info.RelayMode != relayconstant.RelayModeResponses && info.RelayMode != relayconstant.RelayModeResponsesCompact {
@@ -37,6 +40,9 @@ func openRouterRequestURL(info *relaycommon.RelayInfo) (string, error) {
 			}
 		}
 		return base + info.RequestURLPath, nil
+	}
+	if info.RelayMode == relayconstant.RelayModeDecisions {
+		return base + "/alpha/decisions", nil
 	}
 	var path string
 	switch {
@@ -141,6 +147,12 @@ func validateOpenRouterBody(info *relaycommon.RelayInfo, body []byte) ([]byte, e
 	var model string
 	if common.Unmarshal(fields["model"], &model) != nil || strings.TrimSpace(model) == "" {
 		return nil, openRouterInvalid("model is required")
+	}
+	if info.RelayMode == relayconstant.RelayModeDecisions {
+		var request dto.OpenRouterDecisionsRequest
+		if err := common.Unmarshal(body, &request); err != nil {
+			return nil, openRouterInvalid(err.Error())
+		}
 	}
 	if info.RelayMode == relayconstant.RelayModeResponses {
 		for _, name := range []string{"store", "background"} {

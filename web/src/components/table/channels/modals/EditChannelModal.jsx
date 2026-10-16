@@ -3310,7 +3310,7 @@ const EditChannelModal = (props) => {
                         )
                       }
                       extraText={t(
-                        '默认开启，在请求头覆盖处理完成后统一使用 OpenCode 客户端身份，并生成会话、请求标识。关闭后可自定义身份；鉴权和其他自定义头保持生效。',
+                        '默认开启，在请求头覆盖处理完成后统一使用 OpenCode 客户端身份，并生成会话标识。关闭后可自定义身份；鉴权和其他自定义头保持生效。',
                       )}
                     />
                   )}
@@ -4359,6 +4359,11 @@ const EditChannelModal = (props) => {
                               <div>
                                 {t(
                                   '意图理解模型 tongyi-intent-detect-v3 使用 Chat Completions，通过 system 消息选择意图分类或工具调用模式。',
+                                )}
+                              </div>
+                              <div>
+                                {t(
+                                  '决策模型 decision-model-preview 使用 System One（/v1/systemone），请求需包含 state 和 questions，不支持流式。渠道测试可选择自动检测或 System One。',
                                 )}
                               </div>
                             </>

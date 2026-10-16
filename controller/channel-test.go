@@ -276,6 +276,14 @@ func normalizeChannelTestEndpoint(channel *model.Channel, modelName, endpointTyp
 		}
 	}
 	if channel != nil && channel.Type == constant.ChannelTypeQianwenAI {
+		// Select the protocol using the mapped model, while retaining the client
+		// alias on the real request and its billing snapshot.
+		mappingContext, _ := gin.CreateTestContext(httptest.NewRecorder())
+		mappingContext.Set("model_mapping", channel.GetModelMapping())
+		mappingInfo := &relaycommon.RelayInfo{OriginModelName: modelName}
+		if err := helper.ModelMappedHelper(mappingContext, mappingInfo, nil); err == nil {
+			modelName = mappingInfo.UpstreamModelName
+		}
 		return string(common.GetEndpointTypesByChannelType(channel.Type, modelName)[0])
 	}
 	if channel != nil && channel.Type == constant.ChannelTypeTypeSafe {
@@ -406,8 +414,8 @@ func testChannel(channel *model.Channel, testModel string, endpointType string, 
 	if !common.ChannelTestEndpointSupportsStream(constant.EndpointType(endpointType)) {
 		isStream = false
 	}
-	if endpointType == string(constant.EndpointTypeOpenAIDecisions) && channel.Type != constant.ChannelTypeOpenAI {
-		return testResult{localErr: errors.New("/v1/decisions requires an OpenAI channel")}
+	if endpointType == string(constant.EndpointTypeOpenAIDecisions) && channel.Type != constant.ChannelTypeOpenAI && channel.Type != constant.ChannelTypeOpenRouter {
+		return testResult{localErr: errors.New("/v1/decisions requires an OpenAI or OpenRouter channel")}
 	}
 	if endpointType == string(constant.EndpointTypeBatchGeneration) && channel.Type != constant.ChannelTypeGMICloud {
 		return testResult{localErr: errors.New("batch generation tests require a GMICloud channel")}
@@ -418,8 +426,8 @@ func testChannel(channel *model.Channel, testModel string, endpointType string, 
 		}
 		isStream = false
 	}
-	if endpointType == string(constant.EndpointTypeTypeSafeSystemOne) && channel.Type != constant.ChannelTypeTypeSafe {
-		return testResult{localErr: errors.New("/v1/systemone requires a TypeSafe channel")}
+	if endpointType == string(constant.EndpointTypeTypeSafeSystemOne) && channel.Type != constant.ChannelTypeTypeSafe && channel.Type != constant.ChannelTypeQianwenAI {
+		return testResult{localErr: errors.New("/v1/systemone requires a TypeSafe or QianwenAI channel")}
 	}
 
 	requestPath := "/v1/chat/completions"
@@ -830,7 +838,7 @@ func testChannel(channel *model.Channel, testModel string, endpointType string, 
 			}
 		}
 	}
-	if channel.Type == constant.ChannelTypeOpenAI {
+	if channel.Type == constant.ChannelTypeOpenAI || info.RelayMode == relayconstant.RelayModeDecisions {
 		if info.RelayMode == relayconstant.RelayModeDecisions {
 			jsonData, err = relaycommon.PrepareDecisionsRequest(info, jsonData)
 		} else {
@@ -1194,7 +1202,7 @@ func testTaskChannel(c *gin.Context, channel *model.Channel, testModel string, t
 			newAPIError: types.NewOpenAIError(err, types.ErrorCodeBadResponse, http.StatusInternalServerError),
 		}
 	}
-	if resp != nil && resp.StatusCode != http.StatusOK {
+	if resp != nil && resp.StatusCode != http.StatusOK && !(channel.Type == constant.ChannelTypeOpenRouter && resp.StatusCode == http.StatusAccepted) {
 		err := service.RelayErrorHandler(c.Request.Context(), resp, false)
 		common.SysError(fmt.Sprintf(
 			"channel test bad response: channel_id=%d name=%s type=%d model=%s endpoint_type=%s status=%d err=%v",
@@ -1452,6 +1460,12 @@ func buildTestRequest(model string, endpointType string, channel *model.Channel,
 	if endpointType != "" {
 		switch constant.EndpointType(endpointType) {
 		case constant.EndpointTypeOpenAIDecisions:
+			if channel != nil && channel.Type == constant.ChannelTypeOpenRouter {
+				return &dto.OpenRouterDecisionsRequest{Model: model, Fields: map[string]json.RawMessage{
+					"state":     json.RawMessage(`"Have a nice day."`),
+					"questions": json.RawMessage(`{"greeting":{"type":"noul","instructions":"Is this a friendly greeting?"}}`),
+				}}
+			}
 			return &dto.OpenAIDecisionsRequest{Model: model, Fields: map[string]json.RawMessage{
 				"input":     json.RawMessage(`"Have a nice day."`),
 				"questions": json.RawMessage(`[{"type":"predicate","name":"greeting","instructions":"Does the text contain a friendly greeting?"}]`),
